@@ -33,6 +33,14 @@ textarea {
   font: inherit;
 }
 
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 2px;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;

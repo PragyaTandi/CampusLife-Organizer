@@ -119,6 +119,7 @@ class MarketplaceListing(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     seller = relationship("User", back_populates="listings")
+    reports = relationship("ListingReport", back_populates="listing")
 
 
 class ListingInterest(Base):
@@ -185,3 +186,68 @@ class VerificationCheck(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     execution = relationship("AIExecution", back_populates="checks")
+
+
+class StudentSkillProfile(Base):
+    __tablename__ = "student_skill_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    skills = Column(JSON, default=list, nullable=False)
+    interests = Column(JSON, default=list, nullable=False)
+    availability = Column(String(128), default="Flexible")
+    project_goal = Column(String(255), default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class CampusEvent(Base):
+    __tablename__ = "campus_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    organizer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, default="")
+    starts_at = Column(DateTime, nullable=False)
+    ends_at = Column(DateTime, nullable=False)
+    agenda = Column(JSON, default=list, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class GigListing(Base):
+    __tablename__ = "gig_listings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    category = Column(String(64), nullable=False)
+    location = Column(String(128), default="Campus")
+    price = Column(Float, default=0.0)
+    status = Column(String(32), default="open")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class ListingReport(Base):
+    __tablename__ = "listing_reports"
+
+    id = Column(Integer, primary_key=True, index=True)
+    listing_id = Column(Integer, ForeignKey("marketplace_listings.id"), nullable=False)
+    reporter_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    reason = Column(String(500), nullable=False)
+    status = Column(String(32), default="pending")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    listing = relationship("MarketplaceListing", back_populates="reports")
+
+
+class LostFoundClaim(Base):
+    __tablename__ = "lost_found_claims"
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_id = Column(Integer, ForeignKey("lost_found_items.id"), nullable=False)
+    claimant_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    verification_response = Column(Text, nullable=False)
+    status = Column(String(32), default="pending")
+    moderator_note = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    item = relationship("LostFoundItem")
